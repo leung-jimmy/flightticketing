@@ -1,0 +1,16 @@
+@startuml
+title get flights by ID
+
+actor Client
+participant "Flight API" as FlightAPI
+participant "Flight Service" as FlightService
+database "Flight Repository" as FlightRepo
+
+Client -> FlightAPI : GET /flights/{flightId}
+FlightAPI -> FlightService : getFlightByID({flightId})
+FlightService -> FlightRepo : findFlightByID({flightId})
+
+FlightRepo --> FlightService : Flight or Null
+FlightService --> FlightAPI : Flight or Error
+FlightAPI --> Client : 200 OK + Flight or 404 Not Found
+@enduml

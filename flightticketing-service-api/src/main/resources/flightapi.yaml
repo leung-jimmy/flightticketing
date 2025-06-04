@@ -1,0 +1,101 @@
+openapi: 3.0.0
+info:
+  title: Flight Booking API
+  description: |
+    This API represents the control plane of Flight Booking.
+  contact:
+    name: Jimmy Liang
+  version: 1.0.0
+servers:
+  - url: /api
+  - url: /
+tags:
+  - name: flights
+    description: Flights APIs
+paths:
+  /flights:
+    get:
+      tags:
+        - flights
+      operationId: getFlights
+      summary: Get all flights matching an (optional) filter.
+      description: |
+        Retrieves a paginated list of flights matching an (optional) filter.
+      parameters:
+        - in: query
+          name: filter
+          description: Optional filter for flight number, origin, destination, etc.
+          schema:
+            type: string
+        - in: query
+          name: limit
+          description: Maximum number of flights to return.
+          schema:
+            type: integer
+            minimum: 1
+            default: 20
+        - in: query
+          name: offset
+          description: Number of flights to skip before starting to collect the result set.
+          schema:
+            type: integer
+            minimum: 0
+            default: 0
+      responses:
+        '200':
+          description: Paginated list of matching flights.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FlightResult'
+        '404':
+          $ref: '#/components/responses/notFound'
+    post:
+      tags:
+        - flights
+      operationId: createFlight
+      summary: Creates a new flight.
+      description: Creates a new flight with the specified details.
+      requestBody:
+        description: Specifies the flight details.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FlightInput'
+      responses:
+        '201':
+          description: The flight has been created. The response contains the resulting flight entity.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Flight'
+        '400':
+          description: The specified flight is invalid. The response contains information on the specific issue.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /flights/{flightId}:
+    get:
+      tags:
+        - flights
+      operationId: getFlightById
+      summary: Get a flight by id.
+      description: Fetches a flight by the specified id.
+      parameters:
+        - in: path
+          name: flightId
+          required: true
+          schema:
+            type: string
+          description: The unique identifier of the flight.
+      responses:
+        '200':
+          description: Specified flight exists. Response body contains the flight entity.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Flight'
+        '404':
+          $ref: '#/components/responses/notFound'
